@@ -12,12 +12,17 @@ conn_mysql = mysql.connector.connect(
     database='dwbit'
 )
 
+
+# -- - - - - TAGET
 # Membuat objek koneksi ke SQL Server Azure
 server = 'serverdemo-test.database.windows.net'
 database = 'DWdemo'
 username = 'sqladmin'
 password = 'Khairul 190'
+# Driver ODBC yang sesuai untuk SQL Server versi terkini
 driver = '{SQL Server}'
+
+# Membuat string koneksi
 conn_azure = f'SERVER={server};DATABASE={database};UID={username};PWD={password};DRIVER={driver}'
 conn_azure_ = pyodbc.connect(conn_azure)
 
@@ -56,3 +61,22 @@ if len(result) > 0:
         # print(tsql + "\n")
 else:
     print("0 result, no data need to sync\n")
+
+
+# # Mendapatkan tanggal dan waktu hari ini
+current_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+# Membuat pernyataan SQL update
+sql = "UPDATE synch SET last_synch = %s WHERE table_name = %s"
+
+# Menjalankan pernyataan SQL dengan parameter tanggal dan waktu hari ini
+params = (current_date, 'orderdetails')
+cursor.execute(sql, params)
+
+# Melakukan commit perubahan
+conn_mysql.commit()
+
+if cursor.execute(sql):
+    print("Record updated successfully\n")
+else:
+    print("Error updating record\n")
